@@ -1,1 +1,167 @@
-# for-later-use
+# For Later Use
+
+## Astro Layout File with JSON-ld Schemas
+
+---
+import { Schema } from "astro-seo-schema"
+
+import BaseHead from "../components/BaseHead.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+
+import { 
+    SITE_TITLE,
+    SITE_DESCRIPTION,
+    FATHOM_SITE,
+    SCHEMA_NAME,
+    SCHEMA_URL,
+    LINK_GITHUB,
+    LINK_LINKEDIN,
+    LINK_TWITTER,
+    LINK_YOUTUBE,
+    WORK_TITLE,
+    WORK_PLACE,
+    WORK_URL,
+    WORK_FOUNDED,
+    WORK_LINKEDIN,
+    WORK_FACEBOOK,
+    WORK_INSTAGRAM,
+    WORK_TWITTER,
+WORK_DESCRIPTION,
+} from '../config';
+
+const {
+	source
+} = Astro.props;
+---
+
+<html lang="en" class="h-full antialiased">
+	<head>
+		<BaseHead
+            title={SITE_TITLE}
+            description={SITE_DESCRIPTION}
+            source={source}
+        />
+
+        <script type="module">
+            document.documentElement.classList.remove('no-js');
+            document.documentElement.classList.add('js');
+        </script>
+
+        <Schema
+            item={{
+                "@context": "https://schema.org",
+                "@type": "Person",
+                name: SCHEMA_NAME,
+                givenName: 'Steve',
+                familyName: 'McDougall',
+                gender: 'Male',
+                url: SCHEMA_URL,
+                image: `${Astro.site}images/avatar.webp`,
+                sameAs: [
+                    LINK_GITHUB,
+                    LINK_TWITTER,
+                    LINK_LINKEDIN,
+                    LINK_YOUTUBE,
+                ],
+                jobTitle: WORK_TITLE,
+                worksFor: {
+                    '@type': 'Organization',
+                    name: WORK_PLACE,
+                    url: WORK_URL,
+                    foundingDate: WORK_FOUNDED,
+                    sameAs: [
+                        WORK_LINKEDIN,
+                        WORK_FACEBOOK,
+                        WORK_INSTAGRAM,
+                        WORK_TWITTER,
+                    ],
+                    description: WORK_DESCRIPTION,
+                },
+                knowsAbout: [
+                    'PHP',
+                    'Laravel',
+                    'Software Engineering',
+                    'Software Architecture',
+                    'Software Engineering Management'
+                ],
+            }}
+        />
+
+        <script
+            src="https://cdn.usefathom.com/script.js"
+            data-site={FATHOM_SITE}
+            defer
+        ></script>
+
+        <style>
+            [x-cloak] {display: none !important;}
+        </style>
+	</head>
+
+	<body class="flex h-full flex-col bg-zinc-50 dark:bg-black">
+        <div class="fixed inset-0 flex justify-center sm:px-8"><div class="flex w-full max-w-7xl lg:px-8"><div class="w-full bg-white ring-1 ring-zinc-100 dark:bg-zinc-900 dark:ring-zinc-300/20"></div></div></div>
+
+        <section class="relative">
+            <Header />
+            
+            <main>
+                <slot />
+            
+            </main>
+            <Footer />
+        </section>
+
+        <script>
+            import Alpine from 'alpinejs';
+            window.Alpine = Alpine;
+            Alpine.start();
+
+            let prefetched = new Set();
+
+            const intersectionOpts = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 1.0,
+            };
+
+            if ('IntersectionObserver' in window) {
+                let observer = new IntersectionObserver((entries, observer) => {
+                    entries.forEach((entry) => {
+                        const url = entry.target.getAttribute('href');
+
+                        if (prefetched.has(url)) {
+                            observer.unobserve(entry.target);
+                            return;
+                        }
+
+                        if (entry.isIntersecting) {
+                            const linkEl = document.createElement('link');
+                            linkEl.rel = 'prefetch';
+                            linkEl.href = url;
+                            linkEl.as = 'document';
+
+                            linkEl.onload = () => console.log('🌩️ prefetched', url);
+                            linkEl.onerror = (err) => console.log('🤕 can\'t prefetch', url, err);
+
+                            document.head.appendChild(linkEl);
+
+                            // Keep track of prefetched links
+                            prefetched.add(url);
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, intersectionOpts);
+
+                Array.from(document.links).filter(
+                (node) =>
+                    node.href.includes(document.location.origin) && // on origin url
+                    !node.href.includes('#') && // not an id anchor
+                    node.href !== (document.location.href || document.location.href + '/') && // not current page
+                    !prefetched.has(node.href), // not already prefetched
+                ).forEach((node) => observer.observe(node));
+            }
+        </script>
+    </body>
+</html>`
+`
