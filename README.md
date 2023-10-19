@@ -2,7 +2,7 @@
 
 ## Astro Layout File with JSON-ld Schemas
 
----
+`
 import { Schema } from "astro-seo-schema"
 
 import BaseHead from "../components/BaseHead.astro";
@@ -33,9 +33,7 @@ WORK_DESCRIPTION,
 const {
 	source
 } = Astro.props;
----
 
-<html lang="en" class="h-full antialiased">
 	<head>
 		<BaseHead
             title={SITE_TITLE}
@@ -163,5 +161,4 @@ const {
             }
         </script>
     </body>
-</html>`
 `
